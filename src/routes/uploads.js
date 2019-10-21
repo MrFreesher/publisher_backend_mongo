@@ -19,7 +19,7 @@ mongoose.connect(process.env.MONGOURL, { useNewUrlParser: true });
 const db = mongoose.connection;
 db.once('open', () => console.log('Open db'));
 db.on('error', err => console.error(err));
-router.post('/', upload.single('czasopismo'), (req, res) => {
+router.post('/', upload.single('czasopismo'), async (req, res) => {
   const { file } = req;
   if (!file) {
     const error = new Error('Please upload a file');
@@ -31,6 +31,7 @@ router.post('/', upload.single('czasopismo'), (req, res) => {
       'utf8'
     );
     const jsonData = JSON.parse(data);
+
     const magazineList = [];
     for (let i = 0; i < jsonData.length; i += 1) {
       const row = jsonData[i];
@@ -43,19 +44,68 @@ router.post('/', upload.single('czasopismo'), (req, res) => {
         e_issn2: row['e-issn_2'],
         Categories: row.dziedziny,
         Points: {
-          Year: new Date().getFullYear,
+          Year: new Date().getFullYear(),
           Value: row.Punkty
         }
       });
     }
-    magazine
-      .create(magazineList)
-      .then(() => res.send({ message: 'Success' }))
-      .catch(err => {
-        res.send({ message: 'Failed' });
+    let results = await magazine.count({}).exec();
+
+    console.log(results);
+    if (results.length === 0) {
+      magazine
+        .create(magazineList)
+        .then(() => res.send({ message: 'Success' }))
+        .catch(err => {
+          res.send({ message: 'Failed' });
+          console.error(err);
+        });
+    } else {
+      try {
+        const result = await magazine.find().exec();
+        for (let i = 0; i < 1; i += 1) {
+          let searchTerm = await magazine.find({ issn: magazineList[i].issn });
+
+          let updateMagazine = await compareMagazines(searchTerm[0], magazineList[i]);
+          magazine
+            .update({ issn: magazineList['issn'] }, updateMagazine)
+            .then(() => res.send({ message: 'Update' }))
+            .catch(err => console.error(err));
+        }
+      } catch (err) {
         console.error(err);
-      });
+      }
+    }
   }
 });
+router.get('/', async (request, response) => {
+  try {
+    var result = await magazine.find().exec();
+    response.send(result);
+  } catch (error) {
+    response.status(500).send(error);
+  }
+});
+
+async function compareMagazines(oldMagazine, newMagazine) {
+  if (oldMagazine.Tytul1 !== newMagazine.Tytul1) {
+    oldMagazine.Tytul1 = newMagazine.Tytul1;
+    updateMagazine.Tytul1 = newMagazine.Tytul1;
+  }
+  if (oldMagazine.Tytul2 !== newMagazine.Tytul2) {
+    oldMagazine.Tytul2 = newMagazine.Tytul2;
+  }
+  let oldCategories = JSON.stringify(oldMagazine.Categories);
+  let newCategories = JSON.stringify(newMagazine.Categories);
+  if (oldMagazine !== newCategories) {
+    oldMagazine.Categories = newMagazine.Categories;
+    console.log(JSON.parse(newCategories));
+  }
+  console.log(oldMagazine.Points.length);
+
+  
+  console.log(oldMagazine);
+  return oldMagazine;
+}
 
 module.exports = router;
