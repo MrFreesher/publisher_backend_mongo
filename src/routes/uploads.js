@@ -43,16 +43,18 @@ router.post('/', upload.single('czasopismo'), async (req, res) => {
         e_issn: row['e-issn'],
         e_issn2: row['e-issn_2'],
         Categories: row.dziedziny,
-        Points: {
-          Year: new Date().getFullYear(),
-          Value: row.Punkty
-        }
+        Points: [
+          {
+            Year: new Date().getFullYear(),
+            Value: row.Punkty
+          }
+        ]
       });
     }
     let results = await magazine.count({}).exec();
 
     console.log(results);
-    if (results.length === 0) {
+    if (results === 0) {
       magazine
         .create(magazineList)
         .then(() => res.send({ message: 'Success' }))
@@ -64,11 +66,12 @@ router.post('/', upload.single('czasopismo'), async (req, res) => {
       try {
         const result = await magazine.find().exec();
         for (let i = 0; i < 1; i += 1) {
-          let searchTerm = await magazine.find({ issn: magazineList[i].issn });
+          let searchTerm = await magazine.find({ issn: magazineList[i].issn }).exec();
 
           let updateMagazine = await compareMagazines(searchTerm[0], magazineList[i]);
+          await console.log(updateMagazine)
           magazine
-            .update({ issn: magazineList['issn'] }, updateMagazine)
+            .updateOne({ issn: magazineList[i]['issn'] }, updateMagazine)
             .then(() => res.send({ message: 'Update' }))
             .catch(err => console.error(err));
         }
@@ -90,7 +93,7 @@ router.get('/', async (request, response) => {
 async function compareMagazines(oldMagazine, newMagazine) {
   if (oldMagazine.Tytul1 !== newMagazine.Tytul1) {
     oldMagazine.Tytul1 = newMagazine.Tytul1;
-    updateMagazine.Tytul1 = newMagazine.Tytul1;
+    oldMagazine.Tytul1 = newMagazine.Tytul1;
   }
   if (oldMagazine.Tytul2 !== newMagazine.Tytul2) {
     oldMagazine.Tytul2 = newMagazine.Tytul2;
@@ -99,12 +102,25 @@ async function compareMagazines(oldMagazine, newMagazine) {
   let newCategories = JSON.stringify(newMagazine.Categories);
   if (oldMagazine !== newCategories) {
     oldMagazine.Categories = newMagazine.Categories;
-    console.log(JSON.parse(newCategories));
   }
-  console.log(oldMagazine.Points.length);
+const len = Object.keys(oldMagazine.Points).length
 
-  
-  console.log(oldMagazine);
+  for (let g = 0; g < len; g++) {
+   
+    if (oldMagazine.Points[g].Year == new Date().getFullYear()) {
+      if (oldMagazine.Points[g].Value !== newMagazine.Points[0].Value) {
+        oldMagazine.Points[g].Value = newMagazine.Points[0].Value;
+      }
+
+    } else {
+      oldMagazine.Points.push({
+        Year: new Date().getFullYear(),
+        Value: newMagazine.Points[0].Value
+      });
+     
+    }
+  }
+
   return oldMagazine;
 }
 
