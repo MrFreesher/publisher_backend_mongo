@@ -1,8 +1,12 @@
 const express = require('express');
+const morgan = require('morgan');
+require('dotenv').config();
+const uploadRouter = require('./routes/uploads');
 
 const app = express();
-require('dotenv').config();
 
+app.use(morgan('dev'));
+app.use('/upload', uploadRouter);
 app.get('/test', (req, res) => {
   res.send({ message: "It's working" });
 });
