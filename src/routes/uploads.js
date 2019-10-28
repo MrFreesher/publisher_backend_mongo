@@ -69,7 +69,7 @@ router.post('/', upload.single('czasopismo'), async (req, res) => {
           let searchTerm = await magazine.find({ issn: magazineList[i].issn }).exec();
 
           let updateMagazine = await compareMagazines(searchTerm[0], magazineList[i]);
-          await console.log(updateMagazine)
+          await console.log(updateMagazine);
           magazine
             .updateOne({ issn: magazineList[i]['issn'] }, updateMagazine)
             .then(() => res.send({ message: 'Update' }))
@@ -103,21 +103,18 @@ async function compareMagazines(oldMagazine, newMagazine) {
   if (oldMagazine !== newCategories) {
     oldMagazine.Categories = newMagazine.Categories;
   }
-const len = Object.keys(oldMagazine.Points).length
+  const len = Object.keys(oldMagazine.Points).length;
 
   for (let g = 0; g < len; g++) {
-   
-    if (oldMagazine.Points[g].Year == new Date().getFullYear()) {
+    if (oldMagazine.Points[g].Year === new Date().getFullYear()) {
       if (oldMagazine.Points[g].Value !== newMagazine.Points[0].Value) {
         oldMagazine.Points[g].Value = newMagazine.Points[0].Value;
       }
-
     } else {
       oldMagazine.Points.push({
         Year: new Date().getFullYear(),
         Value: newMagazine.Points[0].Value
       });
-     
     }
   }
 

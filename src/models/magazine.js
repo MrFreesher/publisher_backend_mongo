@@ -2,13 +2,15 @@ const mongoose = require('mongoose');
 
 const MagazineScheme = mongoose.Schema({
   Tytul1: {
-    type: String
+    type: String,
+    required: true
   },
   Tytul2: {
     type: String
   },
   issn: {
-    type: String
+    type: String,
+    required: true
   },
   e_issn: {
     type: String
@@ -21,11 +23,20 @@ const MagazineScheme = mongoose.Schema({
   },
   Points: [
     {
-      Year: String,
-      Value: String
+      Year: {
+        type: String,
+        required: true
+      },
+      Value: {
+        type: String,
+        required: true
+      }
     }
   ],
-  Categories: [String]
+  Categories: {
+    type: [String],
+    required: true
+  }
 });
 
 module.exports = mongoose.model('Magazine', MagazineScheme);
