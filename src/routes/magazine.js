@@ -4,7 +4,8 @@ const magazine = require('../models/magazine');
 
 router.get('/', async (req, res) => {
   let query = magazine.find();
-  const { page, limit, title } = req.query;
+  const { page, limit, title } = req.body;
+  console.log(req.body);
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
 
@@ -15,7 +16,7 @@ router.get('/', async (req, res) => {
       .exec();
     res.send(magazines);
   } catch (err) {
-    console.error(err);
+    console.log(err);
     res.send({ message: 'Error' });
   }
 });
