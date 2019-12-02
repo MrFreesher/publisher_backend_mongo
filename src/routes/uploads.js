@@ -36,8 +36,8 @@ router.post('/', upload.single('czasopismo'), async (req, res) => {
     for (let i = 0; i < jsonData.length; i += 1) {
       const row = jsonData[i];
       magazineList.push({
-        Tytul1: row['Tytuł 1'],
-        Tytul2: row['Tytuł 2'],
+        Title1: row['Tytuł 1'],
+        Title2: row['Tytuł 2'],
         issn: row.issn,
         issn2: row.issn_2,
         e_issn: row['e-issn'],
@@ -53,7 +53,6 @@ router.post('/', upload.single('czasopismo'), async (req, res) => {
     }
     let results = await magazine.count({}).exec();
 
-    console.log(results);
     if (results === 0) {
       magazine
         .create(magazineList)
@@ -64,7 +63,6 @@ router.post('/', upload.single('czasopismo'), async (req, res) => {
         });
     } else {
       try {
-        const result = await magazine.find().exec();
         for (let i = 0; i < 1; i += 1) {
           let searchTerm = await magazine.find({ issn: magazineList[i].issn }).exec();
 
@@ -91,16 +89,15 @@ router.get('/', async (request, response) => {
 });
 
 async function compareMagazines(oldMagazine, newMagazine) {
-  if (oldMagazine.Tytul1 !== newMagazine.Tytul1) {
-    oldMagazine.Tytul1 = newMagazine.Tytul1;
-    oldMagazine.Tytul1 = newMagazine.Tytul1;
+  if (oldMagazine.Title1 !== newMagazine.Title1) {
+    oldMagazine.Title1 = newMagazine.Title1;
   }
-  if (oldMagazine.Tytul2 !== newMagazine.Tytul2) {
-    oldMagazine.Tytul2 = newMagazine.Tytul2;
+  if (oldMagazine.Title2 !== newMagazine.Title2) {
+    oldMagazine.Title2 = newMagazine.Title2;
   }
   let oldCategories = JSON.stringify(oldMagazine.Categories);
   let newCategories = JSON.stringify(newMagazine.Categories);
-  if (oldMagazine !== newCategories) {
+  if (oldCategories !== newCategories) {
     oldMagazine.Categories = newMagazine.Categories;
   }
   const len = Object.keys(oldMagazine.Points).length;
