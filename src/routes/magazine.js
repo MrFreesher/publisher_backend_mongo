@@ -3,16 +3,27 @@ const mongoose = require('mongoose');
 const magazine = require('../models/magazine');
 
 router.get('/', async (req, res) => {
-  const query = {};
-  const { page, limit, title } = req.body;
-  console.log(req.body);
+  let query = {};
+  const { page, limit, title, minPoints, maxPoints } = req.body;
+  console.log(title);
+
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
-  if (title !== 'undefined' || title !== '') {
+  if (typeof title !== 'undefined') {
     const reg = new RegExp(`^${title}`);
-    query.Tytul1 = reg;
-    console.log(query);
+    query.Title1 = reg;
   }
+  const points = {};
+  if (minPoints !== 'undefined') {
+    points['$gte'] = minPoints;
+  }
+  if (maxPoints !== 'undefined') {
+    points['$lte'] = maxPoints;
+  }
+  if (Object.keys(points).length > 0) {
+    query = { ...query, 'Points.Value': { ...points } };
+  }
+  console.log(query);
   try {
     const magazines = await magazine
       .find(query)
@@ -21,6 +32,7 @@ router.get('/', async (req, res) => {
       .exec();
 
     await res.send({ lista: magazines });
+    // await res.send({ Len: magazines.length });
   } catch (err) {
     console.log(err);
     res.send({ message: 'Error' });
