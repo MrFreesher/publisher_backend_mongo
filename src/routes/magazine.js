@@ -6,7 +6,7 @@ router.get('/', async (req, res) => {
   let query = {};
   const { page, limit, title, minPoints, maxPoints } = req.body;
   console.log(title);
-  const fields = { Title1: 1, issn: 1, 'Points[0].Value': 1, e_issn: 1 };
+  const fields = { Title1: 1, issn: 1, 'Points.Value': 1, e_issn: 1 };
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
   if (typeof title !== 'undefined') {
