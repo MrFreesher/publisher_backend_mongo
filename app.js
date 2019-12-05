@@ -1,8 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
 require('dotenv').config();
-const uploadRouter = require('./routes/uploads');
-const magazineRouter = require('./routes/magazine');
+const uploadRouter = require('./src/routes/uploads');
+const magazineRouter = require('./src/routes/magazine');
 const cors = require('cors');
 const app = express();
 const bodyParser = require('body-parser');
