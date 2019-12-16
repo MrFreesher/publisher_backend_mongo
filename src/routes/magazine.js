@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
   if (typeof title !== 'undefined') {
-    const reg = new RegExp(`^${title}`);
+    const reg = new RegExp(`${title}`);
     query.Title1 = reg;
   }
   const points = {};
@@ -43,7 +43,7 @@ router.get('/:id', (req, res) => {
   console.log(id);
   const o_id = new mongoose.Types.ObjectId(id);
   const result = magazine
-    .find({ _id: o_id })
+    .findOne({ _id: o_id })
     .then(data => data)
     .then(data => res.send({ data: data }))
     .catch(err => {
