@@ -1,11 +1,20 @@
 const router = require('express').Router();
 const mongoose = require('mongoose');
 const magazine = require('../models/magazine');
-
+/**
+ *
+ * Get a list of magazines with some parameters
+ * Required :
+ * page - number of page
+ * limit - number of elements per page
+ * title - word or phrase at begin or middle text
+ * minPoints - minimum value of points
+ * maxPoints - maximum value of points
+ *
+ */
 router.get('/', async (req, res) => {
   let query = {};
   const { page, limit, title, minPoints, maxPoints } = req.body;
-  console.log(title);
   const fields = { Title1: 1, issn: 1, 'Points.Value': 1, e_issn: 1 };
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
@@ -23,7 +32,6 @@ router.get('/', async (req, res) => {
   if (Object.keys(points).length > 0) {
     query = { ...query, 'Points.Value': { ...points } };
   }
-  console.log(query);
   try {
     const magazines = await magazine
       .find(query, fields)
@@ -34,14 +42,20 @@ router.get('/', async (req, res) => {
     await res.send({ magazines });
     // await res.send({ Len: magazines.length });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.send({ message: 'Error' });
   }
 });
+/**
+ *
+ * Find a details about magazine by id
+ * Required:
+ * id - id of searched magazines
+ *
+ */
 router.get('/:id', (req, res) => {
   const { id } = req.params;
-  console.log(id);
-  const o_id = new mongoose.Types.ObjectId(id);
+  const object_id = new mongoose.Types.ObjectId(id);
   const result = magazine
     .findOne({ _id: o_id })
     .then(data => data)
@@ -50,10 +64,6 @@ router.get('/:id', (req, res) => {
       console.log(err);
       res.send({ message: 'Error' });
     });
-  console.log(result);
-  // if (result) {
-  //   res.send({ magazine: result });
-  // }
 });
 
 module.exports = router;
