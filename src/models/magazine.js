@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
 const MagazineScheme = mongoose.Schema({
-  Tytul1: {
+  Title1: {
     type: String,
     required: true
   },
-  Tytul2: {
+  Title2: {
     type: String
   },
   issn: {
@@ -24,11 +24,11 @@ const MagazineScheme = mongoose.Schema({
   Points: [
     {
       Year: {
-        type: String,
+        type: Number,
         required: true
       },
       Value: {
-        type: String,
+        type: Number,
         required: true
       }
     }
