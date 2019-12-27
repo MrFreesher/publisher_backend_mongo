@@ -49,5 +49,42 @@ router.post('/signup', (req, res, next) => {
       });
     });
 });
+router.post('/login', (req, res, next) => {
+  User.findOne({ Login: req.body.login })
+    .exec()
+    .then(user => {
+      if (user) {
+        bcrypt.compare(req.body.password, user.Password, (err, result) => {
+          if (err) {
+            res.status(401).json({
+              message: 'Auth failed'
+            });
+          }
+          if (result) {
+            res.status(200).json({
+              message: 'Auth success',
+              data: {
+                id: user._id
+              }
+            });
+          } else {
+            res.status(401).json({
+              message: 'Auth failed'
+            });
+          }
+        });
+      } else {
+        res.status(401).json({
+          message: "User with that login doesn't exist"
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({
+        message: 'Problem with login. Try again later',
+        error: err
+      });
+    });
+});
 
 module.exports = router;
