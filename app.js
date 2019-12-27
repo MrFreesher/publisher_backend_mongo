@@ -3,6 +3,7 @@ const morgan = require('morgan');
 require('dotenv').config();
 const uploadRouter = require('./src/routes/uploads');
 const magazineRouter = require('./src/routes/magazine');
+const userRouter = require('./src/routes/user');
 const cors = require('cors');
 const app = express();
 const bodyParser = require('body-parser');
@@ -12,7 +13,7 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use('/upload', uploadRouter);
 app.use('/magazines', magazineRouter);
-
+app.use('/user', userRouter);
 app.get('/test', (req, res) => {
   res.send({ message: "It's working" });
 });
