@@ -87,4 +87,58 @@ router.post('/login', (req, res, next) => {
     });
 });
 
+router.post('/changePassword', (req, res, next) => {
+  const { id, oldPassword, newPassword } = req.body;
+  const object_id = new mongoose.Types.ObjectId(id);
+  User.findOne({ _id: object_id })
+    .then(user => {
+      if (user) {
+        bcrypt.compare(oldPassword, user.Password, (err, result) => {
+          if (err) {
+            res.status(409).json({
+              message: "It's an error. Please try again later."
+            });
+          }
+          if (result) {
+            bcrypt.hash(newPassword, 10, (err, hash) => {
+              if (err) {
+                res.status(409).json({
+                  message: "It's an error. Please try again later."
+                });
+              }
+              if (hash) {
+                user.Password = hash;
+                user
+                  .save()
+                  .then(data => {
+                    res.status(200).json({
+                      message: 'Password changed'
+                    });
+                  })
+                  .catch(err => {
+                    res.status(500).json({
+                      message: 'Problem with changing password. Try again later.'
+                    });
+                  });
+              }
+            });
+          } else {
+            res.status(409).json({
+              message: "Passwords aren't the same."
+            });
+          }
+        });
+      } else {
+        res.status(404).json({
+          message: 'Cannot found user with that id.'
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({
+        message: 'Problem with changing password. Try again later.'
+      });
+    });
+});
+
 module.exports = router;
