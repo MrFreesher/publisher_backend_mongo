@@ -2,7 +2,10 @@ const router = require('express').Router();
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
-
+/**
+ * Route to register user.
+ * Required params is login,password,firstName and lastName
+ */
 router.post('/signup', (req, res, next) => {
   User.findOne({ Login: req.body.login })
     .exec()
@@ -49,6 +52,11 @@ router.post('/signup', (req, res, next) => {
       });
     });
 });
+/**
+ * Route to login user.
+ * Required params: login and password
+ * Return an id of user
+ */
 router.post('/login', (req, res, next) => {
   User.findOne({ Login: req.body.login })
     .exec()
@@ -86,7 +94,10 @@ router.post('/login', (req, res, next) => {
       });
     });
 });
-
+/**
+ * Route to change password for user
+ * Required params: id,oldPassword,newPassword
+ */
 router.post('/changePassword', (req, res, next) => {
   const { id, oldPassword, newPassword } = req.body;
   const object_id = new mongoose.Types.ObjectId(id);
