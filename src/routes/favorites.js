@@ -2,7 +2,10 @@ const router = require('express').Router();
 const mongoose = require('mongoose');
 const Favorite = require('../models/favorite');
 const Magazine = require('../models/magazine');
-
+/**
+ * Route to add magazine to favorites
+ * Required params: userId,magazineId
+ */
 router.post('/', (req, res, next) => {
   const { userId, magazineId } = req.body;
   const objectUserId = new mongoose.Types.ObjectId(userId);
@@ -22,9 +25,13 @@ router.post('/', (req, res, next) => {
       });
     });
 });
+/**
+ * Route to get favorites for user
+ * Required params: userId
+ */
 router.get('/:id', async (req, res, next) => {
   const { id } = req.params;
-  const favoriteMagazines = [];
+
   let data = [];
   await Favorite.find({ userId: id })
     .then(result => {
@@ -43,6 +50,10 @@ router.get('/:id', async (req, res, next) => {
     .exec();
   await res.status(200).send(JSON.stringify(magazines));
 });
+/**
+ * Route to remove magazine from favorites
+ * Required params: userId,magazineId
+ */
 router.delete('/', async (req, res, next) => {
   const { userId, magazineId } = req.body;
 
