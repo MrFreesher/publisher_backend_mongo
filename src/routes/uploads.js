@@ -22,9 +22,7 @@ db.on('error', err => console.error(err));
 router.post('/', upload.single('czasopismo'), async (req, res) => {
   const { file } = req;
   if (!file) {
-    const error = new Error('Please upload a file');
-    error.httpStatusCode = 400;
-    res.send({ error: error.message });
+    res.status(400).json({ message: 'Please upload a file' });
   } else {
     const data = fs.readFileSync(
       path.join(__dirname, '../../', 'uploads', 'czasopismo.json'),
@@ -56,9 +54,9 @@ router.post('/', upload.single('czasopismo'), async (req, res) => {
     if (results === 0) {
       magazine
         .create(magazineList)
-        .then(() => res.send({ message: 'Success' }))
+        .then(() => res.json({ message: 'Success' }))
         .catch(err => {
-          res.send({ message: 'Failed' });
+          res.status(500).json({ message: 'Failed to add magazines' });
           console.error(err);
         });
     } else {
@@ -70,10 +68,13 @@ router.post('/', upload.single('czasopismo'), async (req, res) => {
           await console.log(updateMagazine);
           magazine
             .updateOne({ issn: magazineList[i]['issn'] }, updateMagazine)
-            .then(() => res.send({ message: 'Update' }))
+            .then(() => res.status(201).json({ message: 'Successful update magazines' }))
             .catch(err => console.error(err));
         }
       } catch (err) {
+        res.status(500).json({
+          message: 'Problem with updating details about magazines'
+        });
         console.error(err);
       }
     }
@@ -84,7 +85,10 @@ router.get('/', async (request, response) => {
     var result = await magazine.find().exec();
     response.send(result);
   } catch (error) {
-    response.status(500).send(error);
+    response
+      .status(500)
+      .json({ message: 'Error with comparing magazines. Try again later with update content' });
+    console.error(error);
   }
 });
 

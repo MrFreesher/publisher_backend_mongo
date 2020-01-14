@@ -23,6 +23,7 @@ router.post('/', (req, res, next) => {
       res.status(500).json({
         message: 'Problem with save magazine as favorite.Try again later.'
       });
+      console.error(err);
     });
 });
 /**
@@ -41,6 +42,7 @@ router.get('/:id', async (req, res, next) => {
       res.json({
         message: 'error with fetching data for that user'
       });
+      console.error(err);
     });
 
   const objectMagazineIdArr = data.map(it => new mongoose.Types.ObjectId(it));
@@ -48,7 +50,7 @@ router.get('/:id', async (req, res, next) => {
     .where('_id')
     .in(objectMagazineIdArr)
     .exec();
-  await res.status(200).send(JSON.stringify(magazines));
+  await res.status(200).json(magazines);
 });
 /**
  * Route to remove magazine from favorites
@@ -71,6 +73,7 @@ router.delete('/', async (req, res, next) => {
         res.status(500).json({
           message: 'Problem with deleting favorites'
         });
+        console.error(err);
       }
 
       res.status(200).json({
@@ -79,9 +82,9 @@ router.delete('/', async (req, res, next) => {
     });
   } catch (err) {
     res.status(500).json({
-      message: "It's problem with execution of request",
-      error: err
+      message: "It's problem with execution of request"
     });
+    console.error(err);
   }
 });
 module.exports = router;
