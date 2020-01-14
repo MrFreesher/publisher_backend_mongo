@@ -43,7 +43,7 @@ router.get('/', async (req, res) => {
     // await res.send({ Len: magazines.length });
   } catch (err) {
     console.error(err);
-    res.send({ message: 'Error' });
+    res.status(500).json({ message: 'Error with fetching list of magazines' });
   }
 });
 /**
@@ -61,8 +61,8 @@ router.get('/:id', (req, res) => {
     .then(data => data)
     .then(data => res.send({ data: data }))
     .catch(err => {
-      console.log(err);
-      res.send({ message: 'Error' });
+      console.error(err);
+      res.status(500).json({ message: 'Error with fetching details about magazine' });
     });
 });
 

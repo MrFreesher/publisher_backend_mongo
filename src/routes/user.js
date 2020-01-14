@@ -37,9 +37,9 @@ router.post('/signup', (req, res, next) => {
               })
               .catch(err => {
                 res.status(500).json({
-                  message: 'User creation failed',
-                  error: err
+                  message: 'User creation failed'
                 });
+                console.error(err);
               });
           }
         });
@@ -47,9 +47,9 @@ router.post('/signup', (req, res, next) => {
     })
     .catch(err => {
       res.status(500).json({
-        message: 'Problem with user creation',
-        error: err
+        message: 'Problem with user creation'
       });
+      console.error(err);
     });
 });
 /**
@@ -89,9 +89,9 @@ router.post('/login', (req, res, next) => {
     })
     .catch(err => {
       res.status(500).json({
-        message: 'Problem with login. Try again later',
-        error: err
+        message: 'Problem with login. Try again later'
       });
+      console.error(err);
     });
 });
 /**
@@ -130,6 +130,7 @@ router.post('/changePassword', (req, res, next) => {
                     res.status(500).json({
                       message: 'Problem with changing password. Try again later.'
                     });
+                    console.error(err);
                   });
               }
             });
@@ -149,6 +150,7 @@ router.post('/changePassword', (req, res, next) => {
       res.status(500).json({
         message: 'Problem with changing password. Try again later.'
       });
+      console.error(err);
     });
 });
 
