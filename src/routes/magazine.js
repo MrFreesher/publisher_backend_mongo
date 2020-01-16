@@ -14,7 +14,7 @@ const magazine = require('../models/magazine');
  */
 router.get('/', async (req, res) => {
   let query = {};
-  const { page, limit, title, minPoints, maxPoints } = req.body;
+  const { page, limit, title, minPoints, maxPoints } = req.query;
   const fields = { Title1: 1, issn: 1, 'Points.Value': 1, e_issn: 1 };
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;

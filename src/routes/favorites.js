@@ -50,7 +50,7 @@ router.get('/:id', async (req, res, next) => {
     .where('_id')
     .in(objectMagazineIdArr)
     .exec();
-  await res.status(200).json(magazines);
+  await res.status(200).send(JSON.stringify(magazines));
 });
 /**
  * Route to remove magazine from favorites
