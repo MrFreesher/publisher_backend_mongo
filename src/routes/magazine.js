@@ -14,13 +14,15 @@ const magazine = require('../models/magazine');
  */
 router.get('/', async (req, res) => {
   let query = {};
+  let query2 = {};
   const { page, limit, title, minPoints, maxPoints } = req.query;
-  const fields = { Title1: 1, issn: 1, 'Points.Value': 1, e_issn: 1 };
+  const fields = { Title1: 1, Title2: 1, issn: 1, 'Points.Value': 1, e_issn: 1 };
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
   if (typeof title !== 'undefined') {
     const reg = new RegExp(`${title}`);
     query.Title1 = reg;
+    query2.Title2 = reg;
   }
   const points = {};
   if (typeof minPoints !== 'undefined') {
@@ -31,6 +33,7 @@ router.get('/', async (req, res) => {
   }
   if (Object.keys(points).length > 0) {
     query = { ...query, 'Points.Value': { ...points } };
+    query2 = { ...query2, 'Points.Value': { ...points } };
   }
   try {
     const magazines = await magazine
@@ -38,8 +41,13 @@ router.get('/', async (req, res) => {
       .skip(startIndex)
       .limit(endIndex)
       .exec();
-
-    await res.send({ magazines });
+    const magazines2 = await magazine
+      .find(query2, fields)
+      .skip(startIndex)
+      .limit(endIndex)
+      .exec();
+    const connectedMagazines = [...magazines, ...magazines2];
+    await res.send({ magazines: connectedMagazines });
     // await res.send({ Len: magazines.length });
   } catch (err) {
     console.error(err);
