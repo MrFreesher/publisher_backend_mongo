@@ -61,17 +61,34 @@ router.get('/', async (req, res) => {
  * id - id of searched magazines
  *
  */
+router.get('/ids', (req, res, next) => {
+  magazine
+    .find({}, { _id: 1 })
+    .then(data => {
+      res.send(data);
+      console.log(data);
+    })
+    .catch(err => {
+      res.status(500).json({ message: 'Error with fetching ids about magazine' });
+    });
+});
 router.get('/:id', (req, res) => {
   const { id } = req.params;
   const object_id = new mongoose.Types.ObjectId(id);
   const result = magazine
-    .findOne({ _id: o_id })
+    .findOne({ _id: object_id })
     .then(data => data)
-    .then(data => res.send({ data: data }))
+
+    .then(data => {
+      res.send(JSON.stringify(data));
+    })
     .catch(err => {
       console.error(err);
       res.status(500).json({ message: 'Error with fetching details about magazine' });
     });
 });
+/**
+ * Route to get all ids of magazines
+ */
 
 module.exports = router;
