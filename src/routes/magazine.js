@@ -12,40 +12,8 @@ const magazine = require('../models/magazine');
  * maxPoints - maximum value of points
  *
  */
-router.get('/', async (req, res) => {
-  let query = {};
-
-  const { page, limit, title, minPoints, maxPoints } = req.query;
-  const fields = { Title1: 1, Title2: 1, issn: 1, 'Points.Value': 1, e_issn: 1 };
-  const startIndex = (page - 1) * limit;
-  const endIndex = page * limit;
-  if (typeof title !== 'undefined') {
-    const reg = new RegExp(`${title}`);
-    query.$or = [{ Title1: reg }, { Title2: reg }];
-  }
-  const points = {};
-  if (typeof minPoints !== 'undefined') {
-    points['$gte'] = minPoints;
-  }
-  if (typeof maxPoints !== 'undefined') {
-    points['$lte'] = maxPoints;
-  }
-  if (Object.keys(points).length > 0) {
-    query = { ...query, 'Points.Value': { ...points } };
-  }
-  try {
-    const magazines = await magazine
-      .find(query, fields)
-      .skip(startIndex)
-      .limit(endIndex)
-      .exec();
-
-    await res.send({ magazines: magazines });
-    // await res.send({ Len: magazines.length });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error with fetching list of magazines' });
-  }
+router.get('/', paginatedResults(), async (req, res) => {
+  res.json(res.paginatedResults);
 });
 /**
  *
@@ -83,5 +51,54 @@ router.get('/:id', (req, res) => {
 /**
  * Route to get all ids of magazines
  */
+
+function paginatedResults() {
+  return async (req, res, next) => {
+    let query = {};
+    const results = {};
+    const { page, limit, title, minPoints, maxPoints } = req.query;
+    const fields = { Title1: 1, Title2: 1, issn: 1, 'Points.Value': 1, e_issn: 1 };
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    if (typeof title !== 'undefined') {
+      const reg = new RegExp(`${title}`);
+      query.$or = [{ Title1: reg }, { Title2: reg }];
+    }
+    const points = {};
+    if (typeof minPoints !== 'undefined') {
+      points['$gte'] = minPoints;
+    }
+    if (typeof maxPoints !== 'undefined') {
+      points['$lte'] = maxPoints;
+    }
+    if (Object.keys(points).length > 0) {
+      query = { ...query, 'Points.Value': { ...points } };
+    }
+    try {
+      const magazines = await magazine.find(query, fields).exec();
+      if (endIndex < magazines.length) {
+        results.next = {
+          page: parseInt(page, 10) + 1,
+          limit: limit
+        };
+      }
+
+      if (startIndex > 0) {
+        results.previous = {
+          page: page - 1,
+          limit: limit
+        };
+      }
+
+      results.magazines = magazines.slice(startIndex, endIndex);
+      res.paginatedResults = results;
+      next();
+      // await res.send({ Len: magazines.length });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Error with fetching list of magazines' });
+    }
+  };
+}
 
 module.exports = router;
