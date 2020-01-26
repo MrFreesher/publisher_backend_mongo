@@ -56,10 +56,11 @@ function paginatedResults() {
   return async (req, res, next) => {
     let query = {};
     const results = {};
-    const { page, limit, title, minPoints, maxPoints } = req.query;
+    const { page, limit, title, minPoints, maxPoints, sortOption } = req.query;
     const fields = { Title1: 1, Title2: 1, issn: 1, 'Points.Value': 1, e_issn: 1 };
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
+    let sortCriteria = {};
     if (typeof title !== 'undefined') {
       const reg = new RegExp(`${title}`);
       query.$or = [{ Title1: reg }, { Title2: reg }];
@@ -74,8 +75,27 @@ function paginatedResults() {
     if (Object.keys(points).length > 0) {
       query = { ...query, 'Points.Value': { ...points } };
     }
+    if (typeof sortOption !== 'undefined') {
+      if (sortOption === 'NameASC') {
+        sortCriteria.Title1 = 1;
+      }
+      if (sortOption === 'NameDESC') {
+        sortCriteria.Title1 = -1;
+      }
+      if (sortOption === 'PointsASC') {
+        sortCriteria['Points.Value'] = 1;
+      }
+      if (sortOption === 'PointsDESC') {
+        sortCriteria['Points.Value'] = -1;
+      }
+    } else {
+      sortCriteria.Title1 = 1;
+    }
     try {
-      const magazines = await magazine.find(query, fields).exec();
+      const magazines = await magazine
+        .find(query, fields)
+        .sort(sortCriteria)
+        .exec();
       if (endIndex < magazines.length) {
         results.next = {
           page: parseInt(page, 10) + 1,
