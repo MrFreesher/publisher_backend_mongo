@@ -12,7 +12,7 @@ router.post('/signup', (req, res, next) => {
     .then(user => {
       if (user) {
         res.status(409).json({
-          message: 'User with that login already exist'
+          message: 'User with that login already exists'
         });
       } else {
         bcrypt.hash(req.body.password, 10, (err, hash) => {
@@ -65,7 +65,7 @@ router.post('/login', (req, res, next) => {
         bcrypt.compare(req.body.password, user.Password, (err, result) => {
           if (err) {
             res.status(401).json({
-              message: 'Auth failed'
+              message: 'Incorrect password'
             });
           }
           if (result) {
