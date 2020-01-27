@@ -65,7 +65,7 @@ router.post('/login', (req, res, next) => {
         bcrypt.compare(req.body.password, user.Password, (err, result) => {
           if (err) {
             res.status(401).json({
-              message: 'Incorrect password'
+              message: 'Auth failed'
             });
           }
           if (result) {
@@ -77,7 +77,7 @@ router.post('/login', (req, res, next) => {
             });
           } else {
             res.status(401).json({
-              message: 'Auth failed'
+              message: 'Incorrect password'
             });
           }
         });
